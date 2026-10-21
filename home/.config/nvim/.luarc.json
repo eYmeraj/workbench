@@ -1,0 +1,5 @@
+{
+  "runtime.version": "LuaJIT",
+  "workspace.library": ["$VIMRUNTIME", "$HOME/.local/share/nvim/lazy/snacks.nvim"],
+  "workspace.checkThirdParty": false
+}
