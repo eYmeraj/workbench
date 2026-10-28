@@ -1,0 +1,21 @@
+# Installed into the standard Homebrew prefix. Casks go to /Applications.
+# Language servers live in scripts/17-language-servers.sh.
+# CLI tools
+brew "git"
+brew "neovim"
+brew "node"
+brew "ripgrep"
+brew "fd"
+brew "fzf"
+brew "jq"
+brew "lazygit"
+brew "gh"
+brew "uv"
+# shell
+brew "starship"
+brew "zsh-autosuggestions"
+brew "zsh-syntax-highlighting"
+# apps + font
+cask "wezterm"
+cask "claude-code"
+cask "font-hack-nerd-font"

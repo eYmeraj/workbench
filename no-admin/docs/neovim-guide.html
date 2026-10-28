@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Neovim Pocket Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* Layout: one reading column with a key-reference rhythm; colors are the editor's own rose-pine (dawn by day, moon by night). */
+:root {
+  --bg: #faf4ed;        /* dawn base */
+  --surface: #fffaf3;
+  --overlay: #f2e9e1;
+  --line: #dfdad9;
+  --muted: #9893a5;
+  --subtle: #797593;
+  --text: #575279;
+  --love: #b4637a;      /* errors */
+  --gold: #ea9d34;      /* warnings */
+  --rose: #d7827e;
+  --pine: #286983;      /* links, accents */
+  --foam: #56949f;
+  --iris: #907aa9;      /* headings mark */
+  --code-bg: #232136;   /* the editor mock is always moon */
+  --code-text: #e0def4;
+  --code-muted: #6e6a86;
+  --code-love: #eb6f92;
+  --code-gold: #f6c177;
+  --code-foam: #9ccfd8;
+  --code-iris: #c4a7e7;
+  --code-pine: #3e8fb0;
+  --code-rose: #ea9a97;
+  --code-hl: #393552;
+
+  --font-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.1875rem;
+  --step-2: 1.5rem;
+  --step-3: 2.25rem;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #232136; --surface: #2a273f; --overlay: #393552; --line: #44415a;
+    --muted: #6e6a86; --subtle: #908caa; --text: #e0def4;
+    --love: #eb6f92; --gold: #f6c177; --rose: #ea9a97; --pine: #9ccfd8; --foam: #9ccfd8; --iris: #c4a7e7;
+    --code-bg: #2a273f; --code-hl: #44415a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #232136; --surface: #2a273f; --overlay: #393552; --line: #44415a;
+  --muted: #6e6a86; --subtle: #908caa; --text: #e0def4;
+  --love: #eb6f92; --gold: #f6c177; --rose: #ea9a97; --pine: #9ccfd8; --foam: #9ccfd8; --iris: #c4a7e7;
+  --code-bg: #2a273f; --code-hl: #44415a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 var(--step-0)/1.6 var(--font-body);
+  padding-inline: 16px;
+  padding-block: 0 64px;
+}
+.page { max-width: 46rem; margin: 0 auto; }
+
+header.top { padding-block: 56px 28px; display: grid; gap: 14px; }
+.path { font: 500 var(--step--1)/1.4 var(--font-mono); color: var(--subtle); letter-spacing: 0.01em; }
+h1 {
+  margin: 0;
+  font: 600 var(--step-3)/1.1 var(--font-display);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+h1 .cursor { display: inline-block; width: 0.5em; height: 0.95em; margin-left: 4px; background: var(--iris); vertical-align: -0.08em; }
+.lede { margin: 0; max-width: 62ch; color: var(--text); font-size: var(--step-1); line-height: 1.55; }
+.hint { margin: 6px 0 0; color: var(--subtle); max-width: 62ch; }
+
+nav.toc {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2;
+  background: var(--bg);
+  border-block: 1px solid var(--line);
+  margin-bottom: 8px;
+}
+nav.toc ul {
+  list-style: none; margin: 0; padding: 10px 0;
+  display: flex; gap: 6px 18px; flex-wrap: wrap;
+  font: 500 var(--step--1)/1.4 var(--font-body);
+}
+nav.toc a { color: var(--subtle); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { color: var(--pine); }
+
+section { padding-block: 36px 4px; scroll-margin-top: 56px; }
+h2 {
+  margin: 0 0 6px;
+  font: 600 var(--step-2)/1.2 var(--font-display);
+  text-wrap: balance;
+  display: flex; align-items: baseline; gap: 10px;
+}
+h2::before { content: ":"; font-family: var(--font-mono); color: var(--iris); font-weight: 500; }
+h3 {
+  margin: 28px 0 8px;
+  font: 600 var(--step--1)/1.3 var(--font-body);
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--subtle);
+}
+p { margin: 0 0 12px; max-width: 65ch; }
+.sub { color: var(--subtle); margin-bottom: 16px; }
+a { color: var(--pine); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--iris); outline-offset: 2px; border-radius: 2px; }
+strong { font-weight: 600; }
+
+code {
+  font: 400 0.9em/1.4 var(--font-mono);
+  background: var(--overlay);
+  padding: 1px 5px;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+kbd {
+  display: inline-block;
+  min-width: 1.7em;
+  padding: 1px 7px 2px;
+  font: 500 0.8125rem/1.5 var(--font-mono);
+  text-align: center;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.keys { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.keys .or { color: var(--muted); font-size: var(--step--1); padding-inline: 2px; }
+
+/* key reference rows */
+.ref { margin: 8px 0 0; display: grid; border-top: 1px solid var(--line); }
+.ref > div {
+  display: grid; grid-template-columns: minmax(9.5rem, 13rem) minmax(0, 1fr);
+  gap: 4px 18px; padding: 9px 0; border-bottom: 1px solid var(--line);
+  align-items: baseline;
+}
+.ref dt { margin: 0; }
+.ref dd { margin: 0; min-width: 0; }
+.ref dd .note { display: block; color: var(--subtle); font-size: var(--step--1); margin-top: 2px; }
+
+/* tables */
+.table-wrap { overflow-x: auto; margin-top: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+th {
+  text-align: left; font: 600 var(--step--1)/1.3 var(--font-body);
+  text-transform: uppercase; letter-spacing: 0.07em; color: var(--subtle);
+  padding: 8px 14px 8px 0; border-bottom: 1px solid var(--line);
+}
+td { padding: 10px 14px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+td:first-child { white-space: nowrap; font-weight: 500; }
+td .note { display: block; color: var(--subtle); font-size: var(--step--1); }
+td code { white-space: nowrap; overflow-wrap: normal; }
+
+/* the editor mock */
+figure.mock { margin: 18px 0 8px; }
+.screen {
+  background: var(--code-bg); color: var(--code-text);
+  border-radius: 10px; padding: 14px 0; overflow-x: auto;
+  font: 400 0.8125rem/1.75 var(--font-mono);
+}
+.screen .ln { display: grid; grid-template-columns: 2.2ch 4ch max-content; padding-inline: 12px 18px; white-space: pre; }
+.screen .ln.cur { background: var(--code-hl); }
+.screen .sign { text-align: left; }
+.screen .num { color: var(--code-muted); text-align: right; padding-right: 2ch; }
+.screen .num.abs { color: var(--code-gold); }
+.s-err { color: var(--code-love); }
+.s-git { color: var(--code-foam); }
+.kw { color: var(--code-pine); }
+.ty { color: var(--code-foam); }
+.fn { color: var(--code-rose); }
+.str { color: var(--code-gold); }
+.dim { color: var(--code-muted); }
+.vt-err { color: var(--code-love); }
+.blame { color: var(--code-muted); }
+.screen .status { margin-top: 10px; padding: 2px 14px; display: flex; justify-content: space-between; gap: 16px; color: var(--code-muted); border-top: 1px solid var(--code-hl); white-space: pre; }
+.screen .status .e { color: var(--code-love); }
+figcaption { margin-top: 12px; }
+.legend { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 8px 22px; font-size: var(--step--1); color: var(--subtle); }
+.legend b { color: var(--text); font-weight: 600; }
+
+/* steps, code blocks */
+ol.steps { margin: 8px 0 12px; padding-left: 1.4em; display: grid; gap: 6px; }
+ol.steps li::marker { color: var(--iris); font-family: var(--font-mono); }
+pre.code {
+  margin: 10px 0 14px; padding: 14px 16px; overflow-x: auto;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  font: 400 0.8125rem/1.6 var(--font-mono); color: var(--text);
+}
+pre.code .c { color: var(--muted); }
+ul.plain { margin: 6px 0 12px; padding-left: 1.2em; display: grid; gap: 6px; }
+ul.plain li { max-width: 65ch; }
+
+/* watch-outs */
+.watch { display: grid; gap: 0; margin-top: 8px; border-top: 1px solid var(--line); }
+.watch article { padding: 16px 0; border-bottom: 1px solid var(--line); display: grid; gap: 6px; min-width: 0; }
+.watch h4 { margin: 0; font: 600 var(--step-0)/1.35 var(--font-body); display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.pill {
+  font: 500 0.6875rem/1 var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 4px 7px; border-radius: 999px; border: 1px solid currentColor;
+}
+.pill.risk { color: var(--love); }
+.pill.minor { color: var(--subtle); }
+.watch p { margin: 0; }
+.watch ul.plain { margin: 2px 0 0; }
+
+
+footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: var(--step--1); }
+
+@media (max-width: 560px) {
+  header.top { padding-block: 32px 20px; }
+  h1 { font-size: 1.875rem; }
+  .lede { font-size: var(--step-0); }
+  .ref > div { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  table, tbody, tr, td { display: block; }
+  thead { display: none; }
+  tr { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  td { padding: 2px 0; border: 0; }
+  td:first-child { white-space: normal; }
+  section { padding-block: 28px 4px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+@media print {
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { margin: 14mm 12mm; }
+  body, nav.toc { background: #fff; }
+  body { padding-inline: 0; }
+  header.top { padding-block: 0 20px; }
+  nav.toc { position: static; }
+  section { break-inside: auto; }
+  .watch article, .ref > div, figure.mock { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="top">
+  <div class="path">~/workbench/home/.config/nvim &middot; Neovim 0.12.6 &middot; updated 21 Oct 2026</div>
+  <h1>Neovim Pocket Guide<span class="cursor" aria-hidden="true"></span></h1>
+  <p class="lede">Your config is a deliberately small setup: a fast place to read and fix what agents wrote. It has five leader keys, a git UI, and language servers for TypeScript, Python, Swift, Lua, the web, shell, YAML and Markdown.</p>
+  <p class="hint"><span class="keys"><kbd>Space</kbd></span> is the leader key. Press it and pause: a menu lists every leader key, so you don't need to memorize them.</p>
+</header>
+
+<nav class="toc" aria-label="Sections">
+  <ul>
+    <li><a href="#keys">Everyday keys</a></li>
+    <li><a href="#code">Code intelligence</a></li>
+    <li><a href="#find">Finding things</a></li>
+    <li><a href="#files">Files</a></li>
+    <li><a href="#git">Git</a></li>
+    <li><a href="#watch">Watch out</a></li>
+    <li><a href="#maint">Maintenance</a></li>
+  </ul>
+</nav>
+
+<main>
+
+<section id="keys">
+  <h2>Everyday keys</h2>
+  <p class="sub">These cover most of a session. Everything else is built into Neovim.</p>
+  <dl class="ref">
+    <div><dt><span class="keys"><kbd>Space</kbd><kbd>f</kbd></span></dt><dd>Find a file by name</dd></div>
+    <div><dt><span class="keys"><kbd>Space</kbd><kbd>s</kbd></span></dt><dd>Search text across the project</dd></div>
+    <div><dt><span class="keys"><kbd>Space</kbd><kbd>b</kbd></span></dt><dd>Switch between open files</dd></div>
+    <div><dt><span class="keys"><kbd>Space</kbd><kbd>e</kbd></span></dt><dd>Open the current file's folder in Oil, where you edit files like text</dd></div>
+    <div><dt><span class="keys"><kbd>Space</kbd><kbd>g</kbd></span></dt><dd>Open Neogit: status, stage, commit, push</dd></div>
+    <div><dt><span class="keys"><kbd>g</kbd><kbd>d</kbd></span></dt><dd>Go to the definition of the word under the cursor <span class="note">Files with a language server only. <kbd>Ctrl-o</kbd> jumps back.</span></dd></div>
+    <div><dt><span class="keys"><kbd>K</kbd></span></dt><dd>Show the type and docs for the word under the cursor</dd></div>
+    <div><dt><span class="keys"><kbd>Esc</kbd></span></dt><dd>Save the file (in normal mode) <span class="note">Handy, with some side effects. See <a href="#watch">Watch out</a>.</span></dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-a</kbd></span></dt><dd>Select the whole file</dd></div>
+    <div><dt><span class="keys"><kbd>p</kbd></span></dt><dd>Paste over a selection without losing your clipboard</dd></div>
+  </dl>
+
+  <figure class="mock">
+    <div class="screen" role="img" aria-label="A Neovim window showing the sign column with an E for an error and a bar for a git change, relative line numbers, an inline error message, and git blame on the cursor line">
+      <div class="ln"><span class="sign"> </span><span class="num">2</span><span><span class="kw">export function</span> <span class="fn">area</span>(radius: <span class="ty">number</span>): <span class="ty">number</span> {</span></div>
+      <div class="ln"><span class="sign"> </span><span class="num">1</span><span>  <span class="kw">return</span> Math.PI * radius * radius;</span></div>
+      <div class="ln cur"><span class="sign s-git">┃</span><span class="num abs">14</span><span>}                                                <span class="blame">You, 2 days ago - Add area helper</span></span></div>
+      <div class="ln"><span class="sign"> </span><span class="num">1</span><span></span></div>
+      <div class="ln"><span class="sign s-err">E</span><span class="num">2</span><span><span class="kw">const</span> label: <span class="ty">string</span> = <span class="fn">area</span>(1);   <span class="vt-err">■ Type 'number' is not assignable to type 'string'.</span></span></div>
+      <div class="ln"><span class="sign"> </span><span class="num">3</span><span>console.<span class="fn">log</span>(label);</span></div>
+      <div class="status"><span>src/geometry.ts</span><span><span class="e">E:1</span>  14,1  Top</span></div>
+    </div>
+    <figcaption>
+      <ul class="legend">
+        <li><b>Sign column</b>, far left: <span style="color:var(--love)">E</span> error, W warning, H hint, and a bar for lines changed since the last commit.</li>
+        <li><b>Line numbers</b>: the cursor line shows its real number, the others count up and down from it, so <kbd>2</kbd><kbd>j</kbd> lands two lines down.</li>
+        <li><b>End of line</b>: errors and warnings appear in color. Git blame shows on the cursor line only.</li>
+        <li><b>Status line</b>: problem counts for the file, then line and column.</li>
+      </ul>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="code">
+  <h2>Code intelligence</h2>
+  <p class="sub">Language servers read your project the way VS Code does. They start automatically when you open a matching file.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Language</th><th>Server</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>TypeScript, JavaScript, React</td><td><code>vtsls</code></td><td>Same engine as VS Code. Uses each project's own TypeScript version.</td></tr>
+        <tr><td>Python</td><td><code>pyright</code></td><td>Uses the project's <code>.venv</code> when there is one, so installed packages resolve.</td></tr>
+        <tr><td>Swift</td><td><code>sourcekit-lsp</code></td><td>Ships with Xcode. Xcode projects need a one-time setup, see <a href="#maint">Maintenance</a>.</td></tr>
+        <tr><td>Lua</td><td><code>lua_ls</code></td><td>Knows the Neovim API and Snacks, for editing this config.</td></tr>
+        <tr><td>HTML</td><td><code>html</code></td><td>Tag and attribute completion, and docs on hover. Same server as VS Code.</td></tr>
+        <tr><td>CSS</td><td><code>cssls</code></td><td>Property completion, and flags mistakes like a misspelled property.</td></tr>
+        <tr><td>JSON</td><td><code>jsonls</code></td><td>Syntax errors, plus validation for files that name a <code>$schema</code>.</td></tr>
+        <tr><td>Tailwind CSS</td><td><code>tailwindcss</code></td><td>Class completion and hover in projects that use Tailwind. Idle everywhere else.</td></tr>
+        <tr><td>Bash, shell</td><td><code>bashls</code></td><td>Problems come from <code>shellcheck</code>, which the install script adds too.</td></tr>
+        <tr><td>YAML</td><td><code>yamlls</code></td><td>Picks the right schema for files like GitHub workflows and docker-compose.</td></tr>
+        <tr><td>Markdown</td><td><code>marksman</code></td><td>Completes and follows links and headings, and flags links to files that don't exist.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Moving around code</h3>
+  <dl class="ref">
+    <div><dt><span class="keys"><kbd>g</kbd><kbd>d</kbd></span></dt><dd>Go to definition <span class="note">With several results, a picker opens.</span></dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-o</kbd><span class="or">/</span><kbd>Ctrl-i</kbd></span></dt><dd>Jump back / forward through where you've been</dd></div>
+    <div><dt><span class="keys"><kbd>K</kbd></span></dt><dd>Type and docs. Press <kbd>K</kbd> again to move into the popup and scroll it.</dd></div>
+    <div><dt><span class="keys"><kbd>g</kbd><kbd>r</kbd><kbd>r</kbd></span></dt><dd>List every reference</dd></div>
+    <div><dt><span class="keys"><kbd>g</kbd><kbd>r</kbd><kbd>i</kbd></span></dt><dd>Go to implementation</dd></div>
+    <div><dt><span class="keys"><kbd>g</kbd><kbd>r</kbd><kbd>t</kbd></span></dt><dd>Go to the type's definition</dd></div>
+    <div><dt><span class="keys"><kbd>g</kbd><kbd>O</kbd></span></dt><dd>Outline of every symbol in the file</dd></div>
+  </dl>
+
+  <h3>Changing code</h3>
+  <dl class="ref">
+    <div><dt><span class="keys"><kbd>g</kbd><kbd>r</kbd><kbd>n</kbd></span></dt><dd>Rename a symbol everywhere it's used</dd></div>
+    <div><dt><span class="keys"><kbd>g</kbd><kbd>r</kbd><kbd>a</kbd></span></dt><dd>Code actions: quick fixes, add missing import, organize imports <span class="note">Also works on a visual selection.</span></dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-s</kbd></span></dt><dd>In insert mode: show the parameters of the function you're calling</dd></div>
+  </dl>
+
+  <h3>Completion</h3>
+  <p>A menu opens as you type in code files. It lists what the language server suggests first, then words from your open files. Keep typing to ignore it. In Markdown it only opens for links and headings, so prose stays quiet.</p>
+  <dl class="ref">
+    <div><dt><span class="keys"><kbd>Ctrl-n</kbd><span class="or">/</span><kbd>Ctrl-p</kbd></span></dt><dd>Move down / up the list. The highlighted item is filled in as you move.</dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-y</kbd></span></dt><dd>Accept the item <span class="note">Accepting a function from another file also adds its import line at the top.</span></dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-e</kbd></span></dt><dd>Close the menu and put back what you typed</dd></div>
+    <div><dt><span class="keys"><kbd>Enter</kbd></span></dt><dd>Always starts a new line. It never accepts a suggestion.</dd></div>
+  </dl>
+
+  <h3>Errors and warnings</h3>
+  <dl class="ref">
+    <div><dt><span class="keys"><kbd>]</kbd><kbd>d</kbd><span class="or">/</span><kbd>[</kbd><kbd>d</kbd></span></dt><dd>Next / previous problem in the file</dd></div>
+    <div><dt><span class="keys"><kbd>]</kbd><kbd>D</kbd><span class="or">/</span><kbd>[</kbd><kbd>D</kbd></span></dt><dd>Last / first problem in the file</dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-w</kbd><kbd>d</kbd></span></dt><dd>Show the full message under the cursor in a popup</dd></div>
+  </dl>
+  <p style="margin-top:12px"><code>:lua Snacks.picker.diagnostics()</code> lists every problem in your open files, in a picker.</p>
+  <p>Hints, such as an unused variable, don't get a message at the end of the line. The variable is dimmed and an H shows in the sign column. Language servers only check files you have open. To check a whole TypeScript project, run <code>npx tsc --noEmit</code> in it.</p>
+</section>
+
+<section id="find">
+  <h2>Finding things</h2>
+  <p class="sub">Inside any picker (<kbd>Space</kbd><kbd>f</kbd>, <kbd>s</kbd>, <kbd>b</kbd>), you type to filter and these keys act on the results.</p>
+  <dl class="ref">
+    <div><dt><span class="keys"><kbd>Ctrl-j</kbd><span class="or">/</span><kbd>Ctrl-k</kbd></span></dt><dd>Move down / up</dd></div>
+    <div><dt><span class="keys"><kbd>Enter</kbd></span></dt><dd>Open</dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-v</kbd><span class="or">/</span><kbd>Ctrl-s</kbd></span></dt><dd>Open in a vertical / horizontal split</dd></div>
+    <div><dt><span class="keys"><kbd>Tab</kbd></span></dt><dd>Select several results</dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-q</kbd></span></dt><dd>Send the results to the quickfix list (Neovim's list of locations)</dd></div>
+    <div><dt><span class="keys"><kbd>Alt-h</kbd><span class="or">/</span><kbd>Alt-i</kbd></span></dt><dd>Include hidden / gitignored files</dd></div>
+    <div><dt><span class="keys"><kbd>Alt-p</kbd></span></dt><dd>Show or hide the preview. <kbd>Ctrl-f</kbd> and <kbd>Ctrl-b</kbd> scroll it.</dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-g</kbd></span></dt><dd>In text search: stop searching and filter the current matches instead</dd></div>
+    <div><dt><span class="keys"><kbd>Esc</kbd><kbd>Esc</kbd><span class="or">/</span><kbd>Ctrl-c</kbd></span></dt><dd>Close the picker <span class="note">The first <kbd>Esc</kbd> only stops typing.</span></dd></div>
+    <div><dt><span class="keys"><kbd>?</kbd></span></dt><dd>Show every picker key</dd></div>
+  </dl>
+
+  <h3>Find and replace across the project</h3>
+  <ol class="steps">
+    <li><kbd>Space</kbd><kbd>s</kbd> and type <code>oldName</code></li>
+    <li><kbd>Ctrl-q</kbd> sends every match to the quickfix list</li>
+    <li>Run <code>:cdo s/oldName/newName/g | update</code> to replace in each match and save</li>
+    <li><kbd>]</kbd><kbd>q</kbd> and <kbd>[</kbd><kbd>q</kbd> step through the list to review</li>
+  </ol>
+  <p>For renaming a variable or function in code, <kbd>g</kbd><kbd>r</kbd><kbd>n</kbd> is safer: it only changes real uses of that symbol.</p>
+
+  <h3>More pickers</h3>
+  <p>These have no key yet. Run them as commands, or ask to have any of them mapped.</p>
+  <div class="table-wrap">
+    <table>
+      <tbody>
+        <tr><td><code>:lua Snacks.picker.resume()</code></td><td>Reopen the last picker exactly where you left it</td></tr>
+        <tr><td><code>:lua Snacks.picker.recent()</code></td><td>Files you opened recently</td></tr>
+        <tr><td><code>:lua Snacks.picker.grep_word()</code></td><td>Search for the word under the cursor</td></tr>
+        <tr><td><code>:lua Snacks.picker.git_status()</code></td><td>Files with uncommitted changes</td></tr>
+        <tr><td><code>:lua Snacks.picker.keymaps()</code></td><td>Every key mapping, searchable</td></tr>
+        <tr><td><code>:lua Snacks.picker()</code></td><td>A picker of all pickers</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="files">
+  <h2>Files with Oil</h2>
+  <p class="sub"><kbd>Space</kbd><kbd>e</kbd> shows the current file's folder as a text buffer. Edit it like text, then save to apply.</p>
+  <dl class="ref">
+    <div><dt>Rename</dt><dd>Edit the name</dd></div>
+    <div><dt>Create</dt><dd>Add a new line. End it with <code>/</code> for a folder.</dd></div>
+    <div><dt>Delete</dt><dd><kbd>d</kbd><kbd>d</kbd> on the line</dd></div>
+    <div><dt>Move</dt><dd><kbd>d</kbd><kbd>d</kbd> here, then <kbd>p</kbd> in another Oil folder</dd></div>
+    <div><dt>Apply</dt><dd>Save. Oil lists the changes and asks you to confirm.</dd></div>
+  </dl>
+  <h3>Keys inside Oil</h3>
+  <dl class="ref">
+    <div><dt><span class="keys"><kbd>-</kbd></span></dt><dd>Up to the parent folder</dd></div>
+    <div><dt><span class="keys"><kbd>Enter</kbd></span></dt><dd>Open the file or folder</dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-p</kbd></span></dt><dd>Preview the file</dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-s</kbd></span></dt><dd>Open in a vertical split</dd></div>
+    <div><dt><span class="keys"><kbd>_</kbd></span></dt><dd>Jump to the folder Neovim was started in</dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-c</kbd></span></dt><dd>Close Oil</dd></div>
+    <div><dt><span class="keys"><kbd>g</kbd><kbd>?</kbd></span></dt><dd>Show every Oil key</dd></div>
+  </dl>
+</section>
+
+<section id="git">
+  <h2>Git</h2>
+  <p class="sub"><kbd>Space</kbd><kbd>g</kbd> opens Neogit's status view. Keys act on the file or hunk under the cursor.</p>
+  <dl class="ref">
+    <div><dt><span class="keys"><kbd>Tab</kbd></span></dt><dd>Expand or collapse a file's diff</dd></div>
+    <div><dt><span class="keys"><kbd>s</kbd><span class="or">/</span><kbd>u</kbd></span></dt><dd>Stage / unstage <span class="note"><kbd>S</kbd> and <kbd>U</kbd> do it for everything.</span></dd></div>
+    <div><dt><span class="keys"><kbd>x</kbd></span></dt><dd>Discard the change</dd></div>
+    <div><dt><span class="keys"><kbd>c</kbd><kbd>c</kbd></span></dt><dd>Commit</dd></div>
+    <div><dt><span class="keys"><kbd>P</kbd><span class="or">/</span><kbd>p</kbd><span class="or">/</span><kbd>f</kbd></span></dt><dd>Push / pull / fetch menus</dd></div>
+    <div><dt><span class="keys"><kbd>b</kbd><span class="or">/</span><kbd>l</kbd><span class="or">/</span><kbd>Z</kbd></span></dt><dd>Branch / log / stash menus</dd></div>
+    <div><dt><span class="keys"><kbd>d</kbd></span></dt><dd>Diff menu, opens the change in Diffview</dd></div>
+    <div><dt><span class="keys"><kbd>?</kbd></span></dt><dd>Every menu and key</dd></div>
+    <div><dt><span class="keys"><kbd>q</kbd></span></dt><dd>Close Neogit</dd></div>
+  </dl>
+  <h3>Writing the commit message</h3>
+  <dl class="ref">
+    <div><dt><span class="keys"><kbd>Ctrl-c</kbd><kbd>Ctrl-c</kbd></span></dt><dd>Commit</dd></div>
+    <div><dt><span class="keys"><kbd>Ctrl-c</kbd><kbd>Ctrl-k</kbd></span></dt><dd>Cancel the commit</dd></div>
+    <div><dt><span class="keys"><kbd>Alt-p</kbd><span class="or">/</span><kbd>Alt-n</kbd></span></dt><dd>Bring back earlier commit messages</dd></div>
+  </dl>
+  <h3>Gitsigns</h3>
+  <p>Gitsigns shows the bar in the sign column and the blame on the cursor line. It has no keys, so use commands:</p>
+  <div class="table-wrap">
+    <table>
+      <tbody>
+        <tr><td><code>:Gitsigns preview_hunk</code></td><td>Show what changed in this hunk</td></tr>
+        <tr><td><code>:Gitsigns nav_hunk next</code></td><td>Jump to the next changed hunk</td></tr>
+        <tr><td><code>:Gitsigns reset_hunk</code></td><td>Undo the changes in this hunk</td></tr>
+        <tr><td><code>:Gitsigns stage_hunk</code></td><td>Stage just this hunk</td></tr>
+        <tr><td><code>:Gitsigns blame</code></td><td>Blame for the whole file, in a side panel</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:12px"><code>lazygit</code> is also installed if you'd rather use git from a terminal UI.</p>
+</section>
+
+<section id="watch">
+  <h2>Watch out</h2>
+  <p class="sub">Things in the config that can surprise you. None of these were changed. Each one has a suggested fix if you want it.</p>
+  <div class="watch">
+    <article>
+      <h4><span class="pill risk">Risk</span><kbd>Esc</kbd> always runs <code>:w</code></h4>
+      <ul class="plain">
+        <li>In a new unsaved buffer or in <code>:help</code>, it shows an error (<code>E32: No file name</code>, <code>E45: 'readonly' option is set</code>).</li>
+        <li>In Oil, it applies your pending file changes (after a confirmation).</li>
+        <li>In a Neogit commit message, once <kbd>Esc</kbd> has saved, <kbd>q</kbd> commits right away instead of asking. Cancel with <kbd>Ctrl-c</kbd><kbd>Ctrl-k</kbd>.</li>
+        <li>Most important with agents: <code>:w</code> writes even when you changed nothing. If an agent edited the file after you opened it, Neovim asks whether to overwrite, and one <kbd>y</kbd> wipes the agent's work. <code>:update</code> only writes when you made a change.</li>
+      </ul>
+      <p>Suggested fix, in <code>lua/keys.lua</code>:</p>
+<pre class="code">vim.keymap.set('n', '&lt;Esc&gt;', function()
+  vim.cmd.nohlsearch()  <span class="c">-- also clear search highlight</span>
+  if vim.bo.buftype == '' and vim.api.nvim_buf_get_name(0) ~= '' then
+    vim.cmd('silent update')
+  end
+end, { desc = 'Save' })</pre>
+      <p>With this version, <kbd>Esc</kbd> no longer applies Oil changes, so use <code>:w</code> there.</p>
+    </article>
+    <article>
+      <h4><span class="pill minor">Minor</span>Reload a file an agent changed</h4>
+      <p>Run <code>:e</code> to reload the current file from disk, or <code>:checktime</code> to check every open file.</p>
+    </article>
+    <article>
+      <h4><span class="pill minor">Minor</span><kbd>g</kbd><kbd>d</kbd> needs a language server</h4>
+      <p>It's wired to the language server, so in files without one, such as plain text, it finds nothing. In Markdown it follows links. It replaces Neovim's own <kbd>g</kbd><kbd>d</kbd>, which jumps to where a name is first declared in the file.</p>
+    </article>
+    <article>
+      <h4><span class="pill minor">Minor</span><kbd>Ctrl-a</kbd> replaces "add 1 to the number"</h4>
+      <p>Neovim normally uses <kbd>Ctrl-a</kbd> to increase the number under the cursor (<kbd>Ctrl-x</kbd> still decreases it). If you only select all to copy the file, <code>:%y</code> does it in one step.</p>
+    </article>
+    <article>
+      <h4><span class="pill minor">Minor</span>The paste mapping isn't needed</h4>
+      <p>Capital <kbd>P</kbd> over a selection already pastes without overwriting your clipboard. The mapping does no harm.</p>
+    </article>
+    <article>
+      <h4><span class="pill minor">Minor</span>The mouse is off</h4>
+      <p><code>mouse = ''</code> in <code>lua/vim_config.lua</code> turns it off. <code>mouse = 'a'</code> turns on scrolling and clicking in WezTerm.</p>
+    </article>
+  </div>
+</section>
+
+<section id="maint">
+  <h2>Maintenance</h2>
+
+  <h3>Set up Swift for another Xcode project</h3>
+  <ol class="steps">
+    <li>In the project folder: <code>xcode-build-server config -project Name.xcodeproj -scheme Scheme</code> <span style="color:var(--subtle)">(<code>xcodebuild -list</code> shows the schemes)</span></li>
+    <li>Build once, in Xcode or with <code>xcodebuild -scheme Scheme -destination 'generic/platform=iOS Simulator' build</code></li>
+    <li>Keep the generated <code>buildServer.json</code> out of git. It holds paths from this machine. <code>echo buildServer.json &gt;&gt; .git/info/exclude</code> ignores it without touching <code>.gitignore</code>.</li>
+  </ol>
+  <p>After adding files or targets, build again so the server picks them up.</p>
+
+  <h3>Python virtual environments</h3>
+  <p>pyright uses <code>.venv</code> in the folder that holds <code>pyproject.toml</code>. Without one, third-party imports show as unresolved. <code>uv venv</code> creates it and <code>uv sync</code> installs the project's packages into it. Run <code>:lsp restart</code> afterwards.</p>
+
+  <h3>Add another language</h3>
+  <ol class="steps">
+    <li>Find the server's name: each file in <code>~/.local/share/nvim/lazy/nvim-lspconfig/lsp/</code> is one server, and its header says how to install it</li>
+    <li>Add its install command to <code>scripts/17-language-servers.sh</code> and run <code>./install.sh 17</code></li>
+    <li>Add the name to <code>vim.lsp.enable({ ... })</code> in <code>lua/plugins/lsp.lua</code></li>
+  </ol>
+
+  <h3>Updating</h3>
+  <div class="table-wrap">
+    <table>
+      <tbody>
+        <tr><td><code>:Lazy update</code></td><td>Update plugins. Rewrites <code>lazy-lock.json</code>, which pins versions for a rebuild.</td></tr>
+        <tr><td><code>./install.sh 17</code></td><td>Install or update every language server</td></tr>
+        <tr><td><code>./install.sh 16</code></td><td>Move Node to the newest LTS</td></tr>
+        <tr><td><code>brew upgrade</code></td><td>Update the brew tools</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>When something's off</h3>
+  <div class="table-wrap">
+    <table>
+      <tbody>
+        <tr><td><code>:checkhealth vim.lsp</code></td><td>Which servers are running for this file, and their settings</td></tr>
+        <tr><td><code>:lsp restart</code></td><td>Restart the servers for this file, e.g. after installing packages</td></tr>
+        <tr><td><code>~/.local/state/nvim/lsp.log</code></td><td>Server errors. <code>Command setContext not found</code> lines from vtsls are harmless.</td></tr>
+        <tr><td><code>:checkhealth snacks</code></td><td>If a picker misbehaves</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+</main>
+
+<footer>Generated from your config in <code>~/workbench</code>. Every key in this guide was checked against the installed plugins and Neovim 0.12.6.</footer>
+</div>
+</body>
+</html>
