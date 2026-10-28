@@ -15,6 +15,8 @@ SAVEHIST=50000
 setopt SHARE_HISTORY HIST_IGNORE_DUPS
 
 autoload -Uz compinit && compinit
+# case-insensitive TAB completion
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
 # plugins: ghost text from history + valid commands turn green
 source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
@@ -36,7 +38,3 @@ source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.z
 
 # machine-local overrides (not tracked)
 [ -f "$HOME/.zshrc.local" ] && source "$HOME/.zshrc.local"
-
-# case insesitive TAB
-autoload -Uz compinit && compinit
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'

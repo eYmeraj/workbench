@@ -1,4 +1,4 @@
--- Language servers. The binaries come from ~/workbench/scripts/17-language-servers.sh
+-- Language servers. The binaries come from ~/workbench/admin/scripts/17-language-servers.sh
 -- (sourcekit-lsp ships with Xcode), nvim-lspconfig supplies each server's defaults,
 -- and Neovim's built-in LSP client does the rest.
 return {
